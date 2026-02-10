@@ -1,0 +1,119 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  background: linear-gradient(180deg, #f8fafc, #eef2ff);
+  color: #1f2937;
+  line-height: 1.7;
+}
+
+body.dark {
+  background: linear-gradient(180deg, #020617, #020617);
+  color: #e5e7eb;
+}
+
+body.dark section {
+  background: #020617;
+}
+
+body.dark h2 {
+  color: #93c5fd;
+}
+
+
+/* ===== HEADER ===== */
+header {
+  text-align: center;
+  padding: 4rem 1rem 3rem;
+}
+
+header h1 {
+  font-size: 2.6rem;
+  font-weight: 700;
+}
+
+header p {
+  margin-top: 0.5rem;
+  font-size: 1.1rem;
+  color: #4b5563;
+}
+
+/* ===== SECTIONS ===== */
+section {
+  background: #ffffff;
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s ease;
+}
+
+section.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+h2 {
+  font-size: 1.4rem;
+  margin-bottom: 1.2rem;
+  color: #1e3a8a;
+}
+
+/* ===== LISTAS ===== */
+ul {
+  list-style: none;
+}
+
+ul li {
+  margin-bottom: 0.6rem;
+}
+
+/* ===== TAGS ===== */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.tags li {
+  background: linear-gradient(135deg, #6366f1, #3b82f6);
+  color: #fff;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tags li:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+}
+
+/* ===== LINKS ===== */
+a {
+  color: #2563eb;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ===== FOOTER ===== */
+footer {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
