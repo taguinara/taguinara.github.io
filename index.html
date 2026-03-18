@@ -224,12 +224,20 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <span style="--d:.62s;--h:12px"></span>
     </div>
   </div>
+  <!-- YouTube iframe oculto — toca o áudio real -->
+  <iframe id="ytframe" width="0" height="0" style="position:absolute;opacity:0;pointer-events:none;"
+    src="" frameborder="0"
+    allow="autoplay; encrypted-media"
+    allowfullscreen></iframe>
   <div class="player-controls">
     <button class="pbtn" id="pprev">⏮</button>
     <button class="pbtn" id="pplay">▶</button>
     <button class="pbtn" id="pnext">⏭</button>
     <div class="track-info" id="tinfo">clique play ♪</div>
     <input type="range" class="vol" id="pvol" min="0" max="100" value="60">
+  </div>
+  <div style="font-size:.62rem;color:var(--text2);margin-top:6px;opacity:.6;text-align:center;">
+    ▸ abre o YouTube em nova aba ao tocar
   </div>
 </div>
 
@@ -729,27 +737,61 @@ document.querySelectorAll('.tab').forEach(t=>{
 
 // ── PLAYER ──────────────────────────────────────────────────
 const TRACKS=[
-  {name:'☕ Lofi Chill — Study Beats',url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'},
-  {name:'🌿 Green Tea Vibes',url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3'},
-  {name:'🌧️ Rainy Day Focus',url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-13.mp3'},
-  {name:'🌙 Late Night Coding',url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-16.mp3'},
+  {name:'☕ Lofi Hip Hop Radio 🎧',        yt:'jfKfPfyJRdk'},  // lofi girl - beats to relax
+  {name:'🌿 Lofi Fruits Music 🍃',          yt:'5qap5aO4i9A'},  // chillhop essentials
+  {name:'🌧️ Rainy Day Lofi ☔',            yt:'lTRiuFIWV54'},  // lofi beats - rain
+  {name:'🌙 Lofi Night Coding 🌃',          yt:'rUxyKA_-grg'},  // late night lofi
 ];
-const ap=document.getElementById('ap');
-const pplay=document.getElementById('pplay'),pprev=document.getElementById('pprev'),pnext=document.getElementById('pnext');
-const tinfo=document.getElementById('tinfo'),pvol=document.getElementById('pvol'),eqEl=document.getElementById('eq');
-let ti=0,playing=false;
-function loadT(i){ap.src=TRACKS[i].url;tinfo.textContent=TRACKS[i].name;ap.volume=pvol.value/100;}
+const pplay=document.getElementById('pplay');
+const pprev=document.getElementById('pprev');
+const pnext=document.getElementById('pnext');
+const tinfo=document.getElementById('tinfo');
+const pvol=document.getElementById('pvol');
+const eqEl=document.getElementById('eq');
+let ti=0, playing=false;
+
 function setEQ(on){eqEl.querySelectorAll('span').forEach(s=>s.style.animationPlayState=on?'running':'paused');}
-function togglePlay(){
-  if(playing){ap.pause();pplay.textContent='▶';playing=false;setEQ(false);}
-  else{loadT(ti);ap.play().catch(()=>{});pplay.textContent='⏸';playing=true;setEQ(true);}
+
+function openYT(idx){
+  // Open YouTube in new tab — most reliable cross-browser method
+  const url=`https://www.youtube.com/watch?v=${TRACKS[idx].yt}`;
+  window.open(url,'_blank');
+  tinfo.textContent=TRACKS[idx].name;
+  playing=true;
+  pplay.textContent='⏸';
+  setEQ(true);
 }
-pplay.addEventListener('click',togglePlay);
-pprev.addEventListener('click',()=>{ti=(ti-1+TRACKS.length)%TRACKS.length;loadT(ti);if(playing)ap.play().catch(()=>{});});
-pnext.addEventListener('click',()=>{ti=(ti+1)%TRACKS.length;loadT(ti);if(playing)ap.play().catch(()=>{});});
-pvol.addEventListener('input',()=>{ap.volume=pvol.value/100;});
-ap.addEventListener('ended',()=>{ti=(ti+1)%TRACKS.length;loadT(ti);ap.play().catch(()=>{});});
-loadT(0);
+
+function togglePlay(){
+  if(playing){
+    // Can't pause external tab, so just toggle UI state
+    playing=false;
+    pplay.textContent='▶';
+    setEQ(false);
+    tinfo.textContent='pausado (aba YouTube)';
+  } else {
+    openYT(ti);
+  }
+}
+
+pplay.addEventListener('click', togglePlay);
+pprev.addEventListener('click',()=>{
+  ti=(ti-1+TRACKS.length)%TRACKS.length;
+  tinfo.textContent=TRACKS[ti].name;
+  if(playing) openYT(ti);
+});
+pnext.addEventListener('click',()=>{
+  ti=(ti+1)%TRACKS.length;
+  tinfo.textContent=TRACKS[ti].name;
+  if(playing) openYT(ti);
+});
+pvol.addEventListener('input',()=>{
+  // Volume hint only — actual volume controlled in YouTube tab
+  tinfo.textContent=`volume: ${pvol.value}% (no YouTube)`;
+  setTimeout(()=>{ tinfo.textContent=TRACKS[ti].name; },1800);
+});
+// Init label
+tinfo.textContent=TRACKS[ti].name;
 
 // ── SEND MAIL ───────────────────────────────────────────────
 document.getElementById('sendbtn').addEventListener('click',()=>{
