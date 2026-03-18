@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tainara Almeida</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fdf6f0;--surface:rgba(255,255,255,0.88);--surface2:rgba(255,248,240,0.93);
+  --text:#3d2c1e;--text2:#7a5c45;--accent:#e8a0bf;--accent2:#b5d5c5;
+  --accent3:#ffd6a5;--accent4:#c9b8f0;--border:rgba(200,160,130,0.25);
+  --shadow:rgba(120,80,50,0.12);--grass:#7ec87e;--grass2:#5aad5a;
+}
+[data-theme="dark"]{
+  --bg:#1a1225;--surface:rgba(30,22,45,0.9);--surface2:rgba(22,15,38,0.93);
+  --text:#e8d8f8;--text2:#b8a0d8;--accent:#c97bac;--accent2:#6bbfa0;
+  --accent3:#f0c070;--accent4:#a08ee8;--border:rgba(150,100,200,0.2);
+  --shadow:rgba(0,0,0,0.4);--grass:#3a7a3a;--grass2:#2d602d;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background .6s,color .4s;cursor:none;}
+
+/* CURSOR */
+.cursor{position:fixed;width:12px;height:12px;background:var(--accent);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:multiply;transition:background .3s;}
+.cursor-ring{position:fixed;width:34px;height:34px;border:2px solid var(--accent);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);opacity:.5;transition:border-color .3s;}
+[data-theme="dark"] .cursor{mix-blend-mode:screen;}
+
+/* SKY */
+.sky{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.sun{position:absolute;top:55px;right:110px;width:80px;height:80px;border-radius:50%;background:radial-gradient(circle at 38% 38%,#fff5a0,#ffcc40,#ff9a00);box-shadow:0 0 40px 18px rgba(255,200,60,.4),0 0 90px 45px rgba(255,170,20,.18);animation:sunPulse 4s ease-in-out infinite;transition:opacity .7s,transform .7s;}
+[data-theme="dark"] .sun{opacity:0;transform:translateY(-50px) scale(.4);}
+@keyframes sunPulse{0%,100%{box-shadow:0 0 40px 18px rgba(255,200,60,.4),0 0 90px 45px rgba(255,170,20,.18);}50%{box-shadow:0 0 65px 30px rgba(255,200,60,.6),0 0 120px 65px rgba(255,170,20,.28);}}
+.sun-halo{position:absolute;top:12px;right:68px;width:166px;height:166px;border-radius:50%;border:2px dashed rgba(255,215,50,.25);animation:rotateCW 18s linear infinite;transition:opacity .7s;}
+[data-theme="dark"] .sun-halo{opacity:0;}
+.sun-halo2{position:absolute;top:28px;right:84px;width:134px;height:134px;border-radius:50%;border:1px dashed rgba(255,215,50,.13);animation:rotateCCW 26s linear infinite;transition:opacity .7s;}
+[data-theme="dark"] .sun-halo2{opacity:0;}
+@keyframes rotateCW{to{transform:rotate(360deg);}}
+@keyframes rotateCCW{to{transform:rotate(-360deg);}}
+
+.moon{position:absolute;top:48px;right:100px;width:70px;height:70px;border-radius:50%;background:radial-gradient(circle at 33% 33%,#f0e8ff,#c0aae8);box-shadow:0 0 35px 12px rgba(200,180,255,.35),inset -9px -6px 0 rgba(150,130,190,.35);opacity:0;transform:translateY(50px) scale(.4);transition:opacity .7s,transform .7s;}
+[data-theme="dark"] .moon{opacity:1;transform:none;}
+
+.stars{position:absolute;inset:0;}
+.star{position:absolute;background:white;border-radius:50%;opacity:0;transition:opacity .6s;animation:twinkle var(--dur,3s) ease-in-out infinite var(--delay,0s);}
+[data-theme="dark"] .star{opacity:1;}
+@keyframes twinkle{0%,100%{opacity:.15;transform:scale(1);}50%{opacity:1;transform:scale(1.5);}}
+
+.cloud{position:absolute;background:white;border-radius:50px;opacity:.6;animation:floatCloud var(--dur,22s) linear infinite var(--cdel,0s);transition:opacity .7s;}
+[data-theme="dark"] .cloud{opacity:.04;}
+@keyframes floatCloud{from{transform:translateX(-260px);}to{transform:translateX(calc(100vw + 260px));}}
+
+/* ───── GROUND SCENE ───── */
+.scene{position:fixed;inset:0;z-index:1;pointer-events:none;display:flex;flex-direction:column;justify-content:flex-end;}
+.ground{height:150px;position:relative;overflow:visible;}
+.ground-fill{position:absolute;bottom:0;left:0;right:0;height:100px;background:linear-gradient(to bottom,var(--grass),var(--grass2));}
+.ground-wave{position:absolute;bottom:94px;left:0;right:0;height:60px;overflow:hidden;}
+.ground-wave svg{width:100%;height:100%;}
+
+/* GRASS BLADES */
+.grass-row{position:absolute;bottom:96px;left:0;right:0;height:50px;display:flex;align-items:flex-end;gap:1.5px;padding:0 4px;overflow:hidden;}
+.blade{display:inline-block;width:4px;height:var(--h,20px);background:linear-gradient(to top,var(--grass2),#aaee66);border-radius:3px 3px 0 0;transform-origin:bottom center;animation:sway var(--sd,2.4s) ease-in-out infinite var(--sde,0s);flex-shrink:0;}
+.blade.tall{width:6px;background:linear-gradient(to top,var(--grass2),#88dd44);}
+@keyframes sway{0%,100%{transform:rotate(var(--r1,-6deg));}50%{transform:rotate(var(--r2,6deg));}}
+
+/* ───── FLOWERS ───── */
+#flowerbed{position:absolute;bottom:96px;left:0;right:0;height:160px;pointer-events:all;}
+
+/* Each flower is an SVG with a stem. Transform-origin at very bottom */
+.flower-wrap{
+  position:absolute;
+  bottom:0;
+  transform-origin:50% 100%;
+  animation:gentleSway var(--sw,3s) ease-in-out infinite var(--swd,0s);
+  transition:filter .2s;
+  cursor:pointer;
+  pointer-events:all;
+}
+/* On hover: spring toward mouse via JS class */
+.flower-wrap.hovered{
+  animation:none !important;
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1), filter .2s;
+  filter:drop-shadow(0 0 10px var(--accent)) brightness(1.08);
+}
+@keyframes gentleSway{
+  0%  {transform:rotate(var(--r1,-4deg)) scaleY(1);}
+  50% {transform:rotate(var(--r2,4deg)) scaleY(1.015);}
+  100%{transform:rotate(var(--r1,-4deg)) scaleY(1);}
+}
+
+/* BUTTERFLY */
+.butterfly{position:fixed;top:0;left:0;pointer-events:none;z-index:2;animation:flyPath 22s ease-in-out infinite;}
+@keyframes flyPath{0%{transform:translate(8vw,26vh);}20%{transform:translate(58vw,10vh);}40%{transform:translate(78vw,32vh);}60%{transform:translate(38vw,18vh);}80%{transform:translate(12vw,38vh);}100%{transform:translate(8vw,26vh);}}
+
+/* ───── MAIN LAYOUT ───── */
+.layout{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 16px 200px;}
+
+.header{text-align:center;padding:56px 20px 30px;}
+.header-name{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3.7rem);color:var(--text);line-height:1.1;margin-bottom:6px;}
+.header-sub{font-family:'Caveat',cursive;font-size:1.38rem;color:var(--text2);letter-spacing:.04em;}
+.header-loc{font-size:.8rem;color:var(--text2);margin-top:5px;opacity:.72;}
+
+.controls{position:fixed;top:18px;right:18px;z-index:100;}
+.toggle-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:50px;padding:8px 13px;font-size:1.25rem;cursor:pointer;backdrop-filter:blur(14px);box-shadow:0 2px 12px var(--shadow);transition:transform .25s,background .4s;color:var(--text);}
+.toggle-btn:hover{transform:scale(1.13);}
+
+/* PLAYER */
+.player{position:fixed;bottom:18px;right:18px;z-index:100;background:var(--surface);border:1.5px solid var(--border);border-radius:20px;padding:13px 16px;backdrop-filter:blur(16px);box-shadow:0 4px 20px var(--shadow);min-width:232px;transition:background .4s,border .4s;}
+.player-title{font-family:'Caveat',cursive;font-size:.95rem;color:var(--text2);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.pnote{display:inline-block;animation:bobNote .55s ease-in-out infinite alternate;}
+@keyframes bobNote{to{transform:translateY(-4px);}}
+.player-controls{display:flex;align-items:center;gap:8px;}
+.pbtn{background:var(--accent);border:none;border-radius:50%;width:34px;height:34px;font-size:.88rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .2s,background .3s;color:white;}
+.pbtn:hover{transform:scale(1.15);}
+.track-info{font-size:.73rem;color:var(--text2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.vol{width:58px;accent-color:var(--accent);}
+.eq{display:flex;align-items:flex-end;gap:2px;height:14px;}
+.eq span{width:3px;background:var(--accent2);border-radius:2px;animation:eqb var(--d,.6s) ease-in-out infinite alternate;height:3px;animation-play-state:paused;}
+@keyframes eqb{to{height:var(--h,13px);}}
+
+/* TABS */
+.tabs{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin:8px 0 26px;}
+.tab{background:var(--surface);border:1.5px solid var(--border);border-radius:50px;padding:8px 18px;font-family:'Caveat',cursive;font-size:1rem;cursor:pointer;color:var(--text2);transition:all .22s;backdrop-filter:blur(10px);box-shadow:0 2px 8px var(--shadow);}
+.tab:hover{background:var(--accent);color:white;transform:translateY(-2px);}
+.tab.active{background:var(--accent);color:white;border-color:transparent;box-shadow:0 4px 16px rgba(232,160,191,.4);}
+
+/* PANELS */
+.panel{display:none;max-width:690px;width:100%;animation:panelIn .38s cubic-bezier(.34,1.56,.64,1);}
+.panel.active{display:block;}
+@keyframes panelIn{from{opacity:0;transform:translateY(22px) scale(.97);}to{opacity:1;transform:none;}}
+.card{background:var(--surface);border:1.5px solid var(--border);border-radius:22px;padding:28px;backdrop-filter:blur(16px);box-shadow:0 8px 32px var(--shadow);margin-bottom:16px;transition:background .4s,border .4s;}
+.card h2{font-family:'Playfair Display',serif;font-size:1.5rem;margin-bottom:14px;color:var(--text);display:flex;align-items:center;gap:9px;}
+.card h3{font-family:'Playfair Display',serif;font-size:1rem;color:var(--text);margin:16px 0 4px;}
+.card p{font-size:.88rem;line-height:1.75;color:var(--text2);}
+.card ul{list-style:none;padding:0;}
+.card ul li{font-size:.86rem;color:var(--text2);line-height:1.7;padding-left:16px;position:relative;}
+.card ul li::before{content:'✿';position:absolute;left:0;color:var(--accent);font-size:.68rem;top:3px;}
+.badge{display:inline-block;border-radius:50px;padding:2px 11px;font-size:.73rem;font-weight:500;margin:2px;opacity:.9;}
+.bp{background:var(--accent4);color:#2a1a4a;}
+.bg{background:var(--accent2);color:#0f2a1a;}
+.bo{background:var(--accent3);color:#2a1a0a;}
+.br{background:var(--accent);color:#2a0a1a;}
+[data-theme="dark"] .bp{color:#e8d8f8;}
+[data-theme="dark"] .bg{color:#d8f8e8;}
+[data-theme="dark"] .bo{color:#f8f0d8;}
+[data-theme="dark"] .br{color:#f8d8e8;}
+.eline{border-left:2px solid var(--accent);padding-left:16px;margin-bottom:20px;position:relative;}
+.eline::before{content:'';position:absolute;left:-5px;top:6px;width:8px;height:8px;border-radius:50%;background:var(--accent);}
+.erole{font-weight:500;font-size:.92rem;color:var(--text);}
+.ecompany{font-family:'Caveat',cursive;font-size:.98rem;color:var(--accent);}
+.edate{font-size:.76rem;color:var(--text2);margin-bottom:5px;opacity:.8;}
+.ff{display:flex;flex-direction:column;gap:5px;margin-bottom:16px;}
+.ff label{font-family:'Caveat',cursive;font-size:.98rem;color:var(--text2);}
+.ff input,.ff textarea,.ff select{background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;padding:11px 14px;font-family:'DM Sans',sans-serif;font-size:.88rem;color:var(--text);outline:none;transition:border .3s;}
+.ff input:focus,.ff textarea:focus,.ff select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(232,160,191,.15);}
+.ff textarea{min-height:110px;resize:vertical;}
+.sbtn{background:linear-gradient(135deg,var(--accent),var(--accent4));border:none;border-radius:50px;padding:13px 34px;color:white;font-family:'Caveat',cursive;font-size:1.15rem;cursor:pointer;transition:transform .2s,box-shadow .3s;box-shadow:0 4px 16px rgba(232,160,191,.35);}
+.sbtn:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 8px 24px rgba(232,160,191,.5);}
+.slinks{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;}
+.slink{background:var(--surface2);border:1.5px solid var(--border);border-radius:50px;padding:7px 16px;font-size:.82rem;color:var(--text2);text-decoration:none;transition:all .22s;display:flex;align-items:center;gap:5px;}
+.slink:hover{background:var(--accent);color:white;transform:translateY(-2px);}
+
+/* PARTICLES */
+.petal{position:fixed;pointer-events:none;z-index:9997;border-radius:50%;animation:petalFall var(--pd,1s) ease forwards var(--pde,0s);}
+@keyframes petalFall{0%{opacity:1;transform:translate(0,0) rotate(0deg) scale(1);}100%{opacity:0;transform:translate(var(--px,30px),var(--py,70px)) rotate(720deg) scale(.4);}}
+.hf{position:fixed;font-size:1.35rem;pointer-events:none;z-index:9997;animation:hfUp 1.4s ease forwards;}
+@keyframes hfUp{0%{opacity:1;transform:translate(-50%,-50%) scale(.4);}50%{opacity:1;transform:translate(-50%,-65px) scale(1);}100%{opacity:0;transform:translate(-50%,-115px) scale(.7);}}
+
+@media(max-width:600px){.player{min-width:190px;bottom:10px;right:10px;}.card{padding:18px;}.header-name{font-size:1.8rem;}}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cur"></div>
+<div class="cursor-ring" id="ring"></div>
+
+<!-- SKY -->
+<div class="sky">
+  <div class="sun"></div><div class="sun-halo"></div><div class="sun-halo2"></div>
+  <div class="moon"></div>
+  <div class="stars" id="stars"></div>
+  <div id="clouds"></div>
+</div>
+
+<!-- GROUND SCENE -->
+<div class="scene">
+  <div class="ground">
+    <div class="ground-wave">
+      <svg viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path id="wpath" d="M0,34 C180,6 360,55 540,30 C720,6 900,50 1080,24 C1260,0 1380,32 1440,20 L1440,60 L0,60 Z" fill="#7ec87e"/>
+      </svg>
+    </div>
+    <div class="grass-row" id="gr"></div>
+    <div id="flowerbed"></div>
+    <div class="ground-fill"></div>
+  </div>
+</div>
+
+<!-- BUTTERFLY -->
+<div class="butterfly">
+  <svg width="40" height="30" viewBox="0 0 40 30">
+    <ellipse cx="9" cy="15" rx="9" ry="8" fill="rgba(232,160,191,.8)" style="transform-origin:17px 15px;animation:wf .28s ease-in-out infinite alternate"/>
+    <ellipse cx="31" cy="15" rx="9" ry="8" fill="rgba(201,184,240,.8)" style="transform-origin:23px 15px;animation:wf .28s ease-in-out infinite alternate reverse"/>
+    <ellipse cx="9" cy="20" rx="6" ry="5" fill="rgba(255,214,165,.6)" style="transform-origin:17px 15px;animation:wf .28s ease-in-out infinite alternate"/>
+    <ellipse cx="31" cy="20" rx="6" ry="5" fill="rgba(181,213,197,.6)" style="transform-origin:23px 15px;animation:wf .28s ease-in-out infinite alternate reverse"/>
+    <rect x="18" y="9" width="4" height="12" rx="2" fill="#8b6a8b"/>
+    <style>@keyframes wf{from{transform:scaleX(1);}to{transform:scaleX(.3);}}</style>
+  </svg>
+</div>
+
+<!-- CONTROLS -->
+<div class="controls">
+  <button class="toggle-btn" id="themebtn">☀️</button>
+</div>
+
+<!-- PLAYER -->
+<div class="player">
+  <div class="player-title">
+    <span class="pnote">🎵</span> lofi study
+    <div class="eq" id="eq">
+      <span style="--d:.5s;--h:14px"></span><span style="--d:.72s;--h:10px"></span>
+      <span style="--d:.4s;--h:15px"></span><span style="--d:.88s;--h:8px"></span>
+      <span style="--d:.62s;--h:12px"></span>
+    </div>
+  </div>
+  <div class="player-controls">
+    <button class="pbtn" id="pprev">⏮</button>
+    <button class="pbtn" id="pplay">▶</button>
+    <button class="pbtn" id="pnext">⏭</button>
+    <div class="track-info" id="tinfo">clique play ♪</div>
+    <input type="range" class="vol" id="pvol" min="0" max="100" value="60">
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="layout">
+  <div class="header">
+    <div class="header-name">Tainara Almeida 🐇</div>
+    <div class="header-sub">✦ ciência de dados &amp; biblioteconomia ✦</div>
+    <div class="header-loc">📍 Brasília, DF &nbsp;·&nbsp; tatimes.almeida@gmail.com</div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="sobre">🌸 sobre</button>
+    <button class="tab" data-tab="edu">📚 educação</button>
+    <button class="tab" data-tab="exp">💼 experiência</button>
+    <button class="tab" data-tab="skills">🛠 habilidades</button>
+    <button class="tab" data-tab="proj">🌿 projetos</button>
+    <button class="tab" data-tab="work">✉️ work</button>
+  </div>
+
+  <!-- SOBRE -->
+  <div class="panel active" id="tab-sobre">
+    <div class="card">
+      <h2>🌸 olá, eu sou a Tainara!</h2>
+      <p>Seja bem-vindo! Sou <b>bibliotecária</b> pela Universidade de Brasília (UnB), com experiência profissional em legislação e especializações em Gestão da TI e ciência de dados. 
+      <p style="margin-top:10px">Proativa, autônoma e em constante aprendizado, estou pronta para colaborar em projetos com foco em dados, processos e pessoas. Combino <b>ciência de dados</b> e <b>biblioteconomia</b> para criar soluções que geram impacto real.</p>
+    </div>
+    <div class="card">
+      <h2>✨ destaques</h2>
+      <ul>
+        <li>Aumentei produtividade em <strong>40%</strong> coordenando equipe de 4 profissionais na ANEEL</li>
+        <li>Automatizei processos reduzindo ciclo de <strong>3 dias para 1 dia</strong></li>
+        <li>Gerenciei +<strong>300 atos</strong> publicados mensalmente com 100% de conformidade</li>
+      </ul>
+      <div class="slinks" style="margin-top:16px">
+        <a class="slink" href="https://linkedin.com/in/tainaramalmeida/" target="_blank">🔗 LinkedIn</a>
+        <a class="slink" href="https://github.com/taguinara" target="_blank">🐙 GitHub</a>
+        <a class="slink" href="mailto:tatimes.almeida@gmail.com">📧 Email</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDUCAÇÃO -->
+  <div class="panel" id="tab-edu">
+    <div class="card">
+      <h2>📚 formação acadêmica</h2>
+      <div class="eline"><div class="erole">Técnico em Ciências de Dados</div><div class="ecompany">Senac, DF</div><div class="edate">Ago 2025 – Out 2026 · Brasília</div></div>
+      <div class="eline"><div class="erole">Pós-graduação · Especialização em Ciência de Dados</div><div class="ecompany">Descomplica Faculdade Digital EAD</div><div class="edate">Out 2024 – Dez 2025 · EAD</div></div>
+      <div class="eline"><div class="erole">Pós-graduação · Gestão da Tecnologia da Informação</div><div class="ecompany">Faculdade Unyleya EAD</div><div class="edate">Mai 2020 – Mar 2021 · EAD</div></div>
+      <div class="eline"><div class="erole">Bacharelado em Biblioteconomia</div><div class="ecompany">Universidade de Brasília — UnB</div><div class="edate">Ago 2011 – Dez 2018 · Brasília</div></div>
+    </div>
+    <div class="card">
+      <h2>🎓 cursos complementares</h2>
+      <ul>
+        <li><strong>Programação:</strong> Python (Pandas, NumPy, Matplotlib), R, JavaScript</li>
+        <li><strong>Desenvolvimento web:</strong> HTML, CSS, criação de sites</li>
+        <li><strong>Banco de Dados:</strong> Certificado de administrador — MySQL, PostgreSQL, SQL Server</li>
+        <li><strong>Análise de dados:</strong> Certificado de visualização — Power BI (DAX, Power Query)</li>
+        <li><strong>Gestão de Dados:</strong> Certificado de Assistente pelo Senac DF</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- EXPERIÊNCIA -->
+  <div class="panel" id="tab-exp">
+    <div class="card">
+      <h2>💼 trajetória profissional</h2>
+      <div class="eline">
+        <div class="erole">Coordenadora de Documentação</div>
+        <div class="ecompany">ANEEL – Agência Nacional de Energia Elétrica</div>
+        <div class="edate">Dez 2022 – Jun 2025 · Brasília</div>
+        <ul style="margin-top:6px">
+          <li>Coordenei a equipe de documentação, Núcleo de Qualidade e Revisão(NQR)</li>
+          <li>Dashboards em Power BI e análise SQL para suporte à tomada de decisão estratégica</li>
+          <li>Gestão e automação de processos e atividades para análise de dados</li>
+          <li> Responsável pelo gerenciamento de publicações no Diário Oficial da União (DOU), assegurando precisão, conformidade regulatória e fluidez nos processos decisórios</li>
+        </ul>
+      </div>
+      <div class="eline">
+        <div class="erole">Estagiária de Ciência de Dados</div>
+        <div class="ecompany">Ministério das Comunicações — MCOM</div>
+        <div class="edate">Jun 2022 – Out 2023 · Brasília</div>
+        <ul style="margin-top:6px">
+          <li>Dashboards interativos para visualização de dados estratégicos</li>
+          <li>Estruturação de bases com SQL, Python e APIs para integridade dos dados</li>
+          <li>Suporte a estudos e relatórios estratégicos</li>
+        </ul>
+      </div>
+      <div class="eline">
+        <div class="erole">Bibliotecária Sênior · Apoio Especializado</div>
+        <div class="ecompany">ANEEL – Agência Nacional de Energia Elétrica</div>
+        <div class="edate">Nov 2017 – Dez 2022 · Brasília</div>
+        <ul style="margin-top:6px">
+          <li>Revisão e padronização de atos administrativos conforme normas legislativas</li>
+          <li>Catalogação de atos pelo sistema de biblioteca Sophia</li>
+          <li>Suporte técnico nas reuniões da diretoria colegiada</li>
+          <li>Clube do livro e gestão do conhecimento</li>
+        </ul>
+      </div>
+      <div class="eline">
+        <div class="erole">Estagiária de biblioteconomia</div>
+        <div class="ecompany">TSE - Tribunal Superior Eleitoral</div>
+        <div class="edate">Ago 2014 – Ago 2016 · Brasília</div>
+        <ul style="margin-top:6px">
+          <li>Revisora de atos normativos, tratamento técnico, pesquisa de legislação eleitoral e partidária emanados pelo TSE, sistema de biblioteca Aleph.</li>
+        </ul>
+      </div>
+      <div class="eline">
+        <div class="erole">Estagiária de biblioteconomia</div>
+        <div class="ecompany">Senado Federal</div>
+        <div class="edate">Mar 2014 – Jul 2014 · Brasília</div>
+        <ul style="margin-top:6px">
+          <li>Revisora de atos normativos, base legislativa NADM e tratamento de informação jurídica emanados pelo Senado Federal.</li>
+        </ul>
+      </div>
+      <div class="eline">
+        <div class="erole">Estagiária de biblioteconomia</div>
+        <div class="ecompany">Biblioteca Central da UnB</div>
+        <div class="edate">Nov 2012 – Dez 2013 · Brasília</div>
+        <ul style="margin-top:6px">
+          <li>O setor realiza a restauração de livros danificados, incluindo a reparação de encadernações, conserto de folhas rasgadas ou descoladas, limpeza e tratamento de manchas, entre outros.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- HABILIDADES -->
+  <div class="panel" id="tab-skills">
+    <div class="card">
+      <h2>🛠 habilidades técnicas</h2>
+      <p style="margin-bottom:10px">linguagens &amp; dados</p>
+      <span class="badge br">Python</span><span class="badge br">SQL</span><span class="badge br">R</span><span class="badge br">JavaScript</span><span class="badge br">HTML/CSS</span>
+      <p style="margin:14px 0 10px">ferramentas &amp; plataformas</p>
+      <span class="badge bg">Power BI</span><span class="badge bg">Looker</span><span class="badge bg">Google Cloud</span><span class="badge bg">Excel Avançado</span><span class="badge bg">Microsoft 365</span>
+      <p style="margin:14px 0 10px">metodologias</p>
+      <span class="badge bo">Scrum</span><span class="badge bo">Kanban</span><span class="badge bo">Gestão de Projetos</span><span class="badge bo">Automação de Processos</span>
+      <p style="margin:14px 0 10px">ferramentas de produtividade</p>
+      <span class="badge bp">Google Workspace</span><span class="badge bp">Trello</span><span class="badge bp">Canva</span><span class="badge bp">WhatsApp Business</span>
+    </div>
+    <div class="card">
+      <h2>🌍 idiomas</h2>
+      <ul>
+        <li>🇧🇷 Português — Nativo</li>
+        <li>🇬🇧 Inglês — Intermediário</li>
+        <li>🇫🇷 Francês — Básico</li>
+        <li>🇪🇸 Espanhol — Básico</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>✨ diferenciais</h2>
+      <ul>
+        <li>Organização e gestão de prioridades</li>
+        <li>Comunicação clara e profissional</li>
+        <li>Autonomia e resolução de problemas</li>
+        <li>Adaptabilidade e foco em prazos</li>
+        <li>Alta maturidade digital para trabalho remoto</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- PROJETOS -->
+  <div class="panel" id="tab-proj">
+    <div class="card">
+      <h2>🌿 projetos</h2>
+      <h3>🔢 Numerar — ANEEL</h3>
+      <p>Liderança na otimização e controle de qualidade do sistema de numeração de atos administrativos da ANEEL. Integridade dos registros e conformidade normativa, com suporte consultivo que elevou satisfação e eficiência operacional.</p>
+      <h3 style="margin-top:20px">📡 Wi-Fi Brasil — MCOM</h3>
+      <p>Suporte à gestão do programa Wi-Fi Brasil no Ministério das Comunicações. Dashboards em Power BI e manipulação de bases SQL. Atendimento a usuários e lideranças com resolução de demandas operacionais e técnicas.</p>
+    </div>
+  </div>
+
+  <!-- WORK -->
+  <div class="panel" id="tab-work">
+    <div class="card">
+      <h2>✉️ vamos trabalhar juntos?</h2>
+      <p style="margin-bottom:20px">Aberta a projetos de ciência de dados, análise, dashboards, automação e muito mais!</p>
+      <div class="ff"><label>🌸 seu nome</label><input type="text" id="fn" placeholder="Como você se chama?"/></div>
+      <div class="ff"><label>📧 seu e-mail</label><input type="email" id="fe" placeholder="seu@email.com"/></div>
+      <div class="ff">
+        <label>✨ tipo de projeto</label>
+        <select id="ft">
+          <option value="">Selecione...</option>
+          <option>Dashboard / Power BI</option><option>Análise de dados</option>
+          <option>Automação de processos</option><option>Gestão documental</option>
+          <option>Consultoria em TI</option><option>Outro</option>
+        </select>
+      </div>
+      <div class="ff"><label>💬 mensagem</label><textarea id="fm" placeholder="Conte sobre o seu projeto..."></textarea></div>
+      <button class="sbtn" id="sendbtn">enviar ✦</button>
+    </div>
+    <div class="card">
+      <h2>📌 contato direto</h2>
+      <div class="slinks">
+        <a class="slink" href="mailto:tatimes.almeida@gmail.com">📧 Gmail</a>
+        <a class="slink" href="https://linkedin.com/in/tainaramalmeida/" target="_blank">🔗 LinkedIn</a>
+        <a class="slink" href="https://github.com/taguinara" target="_blank">🐙 GitHub</a>
+      </div>
+    </div>
+  </div>
+</div><!-- /layout -->
+
+<audio id="ap" crossorigin="anonymous"></audio>
+
+<script>
+// ── CURSOR ──────────────────────────────────────────────────
+const cur=document.getElementById('cur'),ring=document.getElementById('ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';});
+setInterval(()=>{rx+=(mx-rx)*.13;ry+=(my-ry)*.13;ring.style.left=rx+'px';ring.style.top=ry+'px';},16);
+
+// ── THEME ───────────────────────────────────────────────────
+let dark=false;
+document.getElementById('themebtn').addEventListener('click',()=>{
+  dark=!dark;
+  document.documentElement.setAttribute('data-theme',dark?'dark':'light');
+  document.getElementById('themebtn').textContent=dark?'🌙':'☀️';
+  document.getElementById('wpath').setAttribute('fill',dark?'#3a7a3a':'#7ec87e');
+});
+
+// ── STARS ───────────────────────────────────────────────────
+const stEl=document.getElementById('stars');
+for(let i=0;i<130;i++){
+  const s=document.createElement('div');s.className='star';
+  const sz=Math.random()*2.8+.7;
+  s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*68}%;--dur:${1.8+Math.random()*4}s;--delay:${Math.random()*3.5}s`;
+  stEl.appendChild(s);
+}
+
+// ── CLOUDS ──────────────────────────────────────────────────
+const cc=document.getElementById('clouds');
+for(let i=0;i<9;i++){
+  const c=document.createElement('div');c.className='cloud';
+  const w=70+Math.random()*140,h=26+Math.random()*30,top=3+Math.random()*26;
+  const dur=20+Math.random()*25,del=-Math.random()*dur;
+  c.style.cssText=`width:${w}px;height:${h}px;top:${top}%;--dur:${dur}s;--cdel:${del}s`;
+  cc.appendChild(c);
+}
+
+// ── GRASS ───────────────────────────────────────────────────
+function buildGrass(){
+  const gr=document.getElementById('gr');gr.innerHTML='';
+  const n=Math.ceil(window.innerWidth/6.5)+30;
+  for(let i=0;i<n;i++){
+    const b=document.createElement('div');
+    const tall=Math.random()<.15;
+    b.className='blade'+(tall?' tall':'');
+    const h=tall?28+Math.random()*24:10+Math.random()*18;
+    const dur=1.6+Math.random()*2.2,del=Math.random()*2.8;
+    const r1=-(2+Math.random()*7),r2=2+Math.random()*7;
+    b.style.cssText=`--h:${h}px;--sd:${dur}s;--sde:${del}s;--r1:${r1}deg;--r2:${r2}deg`;
+    gr.appendChild(b);
+  }
+}
+buildGrass();window.addEventListener('resize',()=>{buildGrass();buildFlowers();});
+
+// ── FLOWERS WITH STEMS ──────────────────────────────────────
+// 10 pastel colour combos: [petalColor, centerColor, stemColor, leafColor]
+const PALETTES = [
+  // rose pink
+  {p1:'#ffb3c6',p2:'#ff8fab',c:'#ffe4b8',s:'#6bbf6b',l:'#5aad5a'},
+  // lavender
+  {p1:'#d8b4fe',p2:'#c084fc',c:'#fff0b8',s:'#6bbf6b',l:'#5aad5a'},
+  // peach
+  {p1:'#fed7aa',p2:'#fb923c',c:'#fff0c8',s:'#5aad5a',l:'#4a9a4a'},
+  // sky blue
+  {p1:'#bae6fd',p2:'#38bdf8',c:'#fffbe0',s:'#6bbf6b',l:'#5aad5a'},
+  // mint
+  {p1:'#a7f3d0',p2:'#34d399',c:'#fff9c4',s:'#5aad5a',l:'#4a9a4a'},
+  // yellow
+  {p1:'#fef08a',p2:'#facc15',c:'#ff8fab',s:'#6bbf6b',l:'#5aad5a'},
+  // lilac
+  {p1:'#e9d5ff',p2:'#a855f7',c:'#fef08a',s:'#6bbf6b',l:'#5aad5a'},
+  // coral
+  {p1:'#fda4af',p2:'#f43f5e',c:'#fff9c4',s:'#5aad5a',l:'#4a9a4a'},
+  // light green
+  {p1:'#bbf7d0',p2:'#4ade80',c:'#fff0b8',s:'#5aad5a',l:'#4a9a4a'},
+  // baby pink
+  {p1:'#fce7f3',p2:'#f9a8d4',c:'#fef9c3',s:'#6bbf6b',l:'#5aad5a'},
+];
+
+// Flower type 1: round daisy with stem + 2 leaves
+function daisySVG(pal, totalH, headR){
+  const stemW=4, cx=totalH*.5, stemTop=headR*2+4;
+  const stemLen=totalH-stemTop;
+  // slight curve to stem via quadratic
+  const stemX1=cx+6, midY=stemTop+stemLen*.45;
+  const leafY1=stemTop+stemLen*.38, leafY2=stemTop+stemLen*.65;
+  let petals='';
+  const np=8, pr=headR*.7;
+  for(let i=0;i<np;i++){
+    const a=(i/np)*Math.PI*2;
+    const px=cx+Math.cos(a)*headR*.72, py=stemTop+Math.sin(a)*headR*.72;
+    petals+=`<ellipse cx="${px}" cy="${py}" rx="${pr*.44}" ry="${pr*.72}"
+      fill="${pal.p1}" fill-opacity=".92"
+      transform="rotate(${(i/np)*360},${px},${py})"/>`;
+  }
+  // second layer offset
+  for(let i=0;i<np;i++){
+    const a=((i+.5)/np)*Math.PI*2;
+    const px=cx+Math.cos(a)*headR*.68, py=stemTop+Math.sin(a)*headR*.68;
+    petals+=`<ellipse cx="${px}" cy="${py}" rx="${pr*.36}" ry="${pr*.62}"
+      fill="${pal.p2}" fill-opacity=".7"
+      transform="rotate(${((i+.5)/np)*360},${px},${py})"/>`;
+  }
+  const w=totalH;
+  return `<svg width="${w}" height="${totalH}" viewBox="0 0 ${w} ${totalH}" xmlns="http://www.w3.org/2000/svg" overflow="visible">
+    <!-- STEM -->
+    <path d="M${cx},${stemTop+stemLen} Q${stemX1},${midY} ${cx},${stemTop}"
+      stroke="${pal.s}" stroke-width="${stemW}" fill="none" stroke-linecap="round"/>
+    <!-- LEAF LEFT -->
+    <path d="M${cx},${leafY1} Q${cx-22},${leafY1-10} ${cx-14},${leafY1+16}"
+      fill="${pal.l}" opacity=".9"/>
+    <!-- LEAF RIGHT -->
+    <path d="M${cx},${leafY2} Q${cx+20},${leafY2-8} ${cx+12},${leafY2+14}"
+      fill="${pal.l}" opacity=".9"/>
+    <!-- PETALS -->
+    ${petals}
+    <!-- CENTER -->
+    <circle cx="${cx}" cy="${stemTop}" r="${headR*.38}" fill="${pal.c}"/>
+    <circle cx="${cx}" cy="${stemTop}" r="${headR*.18}" fill="rgba(255,255,255,.6)"/>
+  </svg>`;
+}
+
+// Flower type 2: tulip shape
+function tulipSVG(pal, totalH){
+  const cx=totalH*.5, stemTop=totalH*.34;
+  const stemLen=totalH-stemTop;
+  const leafY=stemTop+stemLen*.5;
+  const hw=totalH*.22, hh=totalH*.28;
+  return `<svg width="${totalH}" height="${totalH}" viewBox="0 0 ${totalH} ${totalH}" xmlns="http://www.w3.org/2000/svg" overflow="visible">
+    <!-- STEM -->
+    <path d="M${cx},${stemTop+stemLen} Q${cx+8},${stemTop+stemLen*.5} ${cx},${stemTop+hh*.6}"
+      stroke="${pal.s}" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <!-- LEAF LEFT -->
+    <path d="M${cx},${leafY} Q${cx-24},${leafY-12} ${cx-16},${leafY+20}"
+      fill="${pal.l}" opacity=".85"/>
+    <!-- LEAF RIGHT -->
+    <path d="M${cx},${leafY+8} Q${cx+22},${leafY} ${cx+14},${leafY+22}"
+      fill="${pal.l}" opacity=".85"/>
+    <!-- TULIP BODY -->
+    <ellipse cx="${cx}" cy="${stemTop+hh*.55}" rx="${hw}" ry="${hh*.6}" fill="${pal.p1}" opacity=".9"/>
+    <!-- INNER PETALS -->
+    <ellipse cx="${cx-.5*hw*.5}" cy="${stemTop+hh*.3}" rx="${hw*.38}" ry="${hh*.52}" fill="${pal.p2}" opacity=".85"/>
+    <ellipse cx="${cx+.5*hw*.5}" cy="${stemTop+hh*.3}" rx="${hw*.38}" ry="${hh*.52}" fill="${pal.p2}" opacity=".75"/>
+    <ellipse cx="${cx}" cy="${stemTop+hh*.2}" rx="${hw*.25}" ry="${hh*.45}" fill="${pal.p1}" opacity=".7"/>
+  </svg>`;
+}
+
+// Flower type 3: sunflower-ish (many thin petals)
+function sunflowerSVG(pal, totalH, headR){
+  const cx=totalH*.5, stemTop=headR+4;
+  const stemLen=totalH-stemTop;
+  const stemX1=cx-5, midY=stemTop+stemLen*.4;
+  const leafY1=stemTop+stemLen*.35, leafY2=stemTop+stemLen*.6;
+  let petals='';
+  const np=12;
+  for(let i=0;i<np;i++){
+    const a=(i/np)*Math.PI*2;
+    const px=cx+Math.cos(a)*headR*.82, py=stemTop+Math.sin(a)*headR*.82;
+    petals+=`<ellipse cx="${px}" cy="${py}" rx="${headR*.28}" ry="${headR*.62}"
+      fill="${pal.p1}" fill-opacity=".88"
+      transform="rotate(${(i/np)*360+10},${px},${py})"/>`;
+  }
+  for(let i=0;i<np;i++){
+    const a=((i+.5)/np)*Math.PI*2;
+    const px=cx+Math.cos(a)*headR*.75, py=stemTop+Math.sin(a)*headR*.75;
+    petals+=`<ellipse cx="${px}" cy="${py}" rx="${headR*.22}" ry="${headR*.5}"
+      fill="${pal.p2}" fill-opacity=".6"
+      transform="rotate(${((i+.5)/np)*360},${px},${py})"/>`;
+  }
+  const w=totalH;
+  return `<svg width="${w}" height="${totalH}" viewBox="0 0 ${w} ${totalH}" xmlns="http://www.w3.org/2000/svg" overflow="visible">
+    <path d="M${cx},${stemTop+stemLen} Q${stemX1},${midY} ${cx},${stemTop}"
+      stroke="${pal.s}" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+    <path d="M${cx},${leafY1} Q${cx-26},${leafY1-14} ${cx-18},${leafY1+18}"
+      fill="${pal.l}" opacity=".85"/>
+    <path d="M${cx},${leafY2} Q${cx+24},${leafY2-10} ${cx+16},${leafY2+16}"
+      fill="${pal.l}" opacity=".85"/>
+    ${petals}
+    <circle cx="${cx}" cy="${stemTop}" r="${headR*.42}" fill="${pal.c}"/>
+    <circle cx="${cx}" cy="${stemTop}" r="${headR*.24}" fill="rgba(90,50,20,.35)"/>
+    <circle cx="${cx}" cy="${stemTop}" r="${headR*.1}" fill="rgba(255,255,255,.5)"/>
+  </svg>`;
+}
+
+// Flower type 4: simple 5-petal rose-like
+function roseSVG(pal, totalH){
+  const cx=totalH*.5, stemTop=totalH*.3;
+  const stemLen=totalH-stemTop;
+  const r=totalH*.18;
+  const leafY=stemTop+stemLen*.48;
+  let petals='';
+  for(let i=0;i<5;i++){
+    const a=(i/5)*Math.PI*2 - Math.PI/2;
+    const px=cx+Math.cos(a)*r*.7, py=stemTop+Math.sin(a)*r*.7;
+    petals+=`<ellipse cx="${px}" cy="${py}" rx="${r*.68}" ry="${r*.88}"
+      fill="${pal.p1}" opacity=".9"
+      transform="rotate(${(i/5)*360},${px},${py})"/>`;
+  }
+  return `<svg width="${totalH}" height="${totalH}" viewBox="0 0 ${totalH} ${totalH}" xmlns="http://www.w3.org/2000/svg" overflow="visible">
+    <path d="M${cx},${stemTop+stemLen} Q${cx-6},${stemTop+stemLen*.5} ${cx},${stemTop+r*.8}"
+      stroke="${pal.s}" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    <path d="M${cx},${leafY} Q${cx-22},${leafY-12} ${cx-14},${leafY+18}" fill="${pal.l}" opacity=".85"/>
+    <path d="M${cx},${leafY+6} Q${cx+20},${leafY-8} ${cx+12},${leafY+18}" fill="${pal.l}" opacity=".85"/>
+    ${petals}
+    <circle cx="${cx}" cy="${stemTop}" r="${r*.38}" fill="${pal.p2}" opacity=".95"/>
+    <circle cx="${cx}" cy="${stemTop}" r="${r*.18}" fill="${pal.c}"/>
+  </svg>`;
+}
+
+function buildFlowers(){
+  const fb=document.getElementById('flowerbed');fb.innerHTML='';
+  const n=Math.max(14, Math.floor(window.innerWidth/65));
+  // distribute evenly with some randomness
+  for(let i=0;i<n;i++){
+    const wrap=document.createElement('div');
+    wrap.className='flower-wrap';
+    const pal=PALETTES[i%PALETTES.length];
+    // vary height per flower
+    const totalH=55+Math.random()*75; // 55–130px tall
+    const headR=totalH*.18+Math.random()*totalH*.06;
+    const type=i%4;
+    let svg='';
+    if(type===0) svg=daisySVG(pal,totalH,headR);
+    else if(type===1) svg=tulipSVG(pal,totalH);
+    else if(type===2) svg=sunflowerSVG(pal,totalH,headR);
+    else svg=roseSVG(pal,totalH);
+    wrap.innerHTML=svg;
+    const left=.5+i*(99/n)+(-2+Math.random()*4);
+    const dur=2.2+Math.random()*2.8, del=Math.random()*3.5;
+    const r1=-(3+Math.random()*5), r2=3+Math.random()*5;
+    wrap.style.cssText=`left:${Math.min(left,98)}%;--sw:${dur}s;--swd:${del}s;--r1:${r1}deg;--r2:${r2}deg;width:${totalH}px;height:${totalH}px;margin-left:${-totalH/2}px;`;
+    // Mouse interaction
+    wrap.addEventListener('mouseenter', e => {
+      wrap.classList.add('hovered');
+      const rect=wrap.getBoundingClientRect();
+      const cx=rect.left+rect.width/2;
+      const dx=e.clientX-cx;
+      const rot=Math.max(-30,Math.min(30, dx*0.8));
+      wrap.style.transform=`rotate(${rot}deg) scale(1.22)`;
+      spawnHF(e.clientX, e.clientY);
+    });
+    wrap.addEventListener('mousemove', e => {
+      const rect=wrap.getBoundingClientRect();
+      const cx=rect.left+rect.width/2;
+      const dx=e.clientX-cx;
+      const rot=Math.max(-28,Math.min(28, dx*0.7));
+      wrap.style.transform=`rotate(${rot}deg) scale(1.22)`;
+    });
+    wrap.addEventListener('mouseleave', () => {
+      wrap.classList.remove('hovered');
+      wrap.style.transform='';
+    });
+    wrap.addEventListener('click', e=>confetti(e.clientX,e.clientY));
+    fb.appendChild(wrap);
+  }
+}
+buildFlowers();
+
+// ── HOVER FLOWERS ───────────────────────────────────────────
+const EMOJIS=['🌸','🌺','🌼','🌻','💐','🌷','✿','❀','🌹','🏵️'];
+function spawnHF(x,y){
+  for(let i=0;i<4;i++){
+    const h=document.createElement('div');h.className='hf';
+    h.textContent=EMOJIS[Math.floor(Math.random()*EMOJIS.length)];
+    h.style.left=`${x+(-28+Math.random()*56)}px`;
+    h.style.top=`${y}px`;h.style.animationDelay=`${i*.07}s`;
+    document.body.appendChild(h);setTimeout(()=>h.remove(),1500);
+  }
+}
+let lastHF=0;
+document.addEventListener('mousemove',e=>{
+  const now=Date.now();
+  if(now-lastHF>450&&Math.random()<.08){lastHF=now;spawnHF(e.clientX,e.clientY);}
+});
+
+// ── CONFETTI ────────────────────────────────────────────────
+const CC=['#ffb3c6','#ffd6a5','#c9b8f0','#b5d5c5','#ffe066','#ff85a1','#a7f3d0'];
+function confetti(x,y){
+  for(let i=0;i<16;i++){
+    const p=document.createElement('div');p.className='petal';
+    const sz=6+Math.random()*7;
+    p.style.cssText=`left:${x}px;top:${y}px;background:${CC[i%CC.length]};width:${sz}px;height:${sz}px;border-radius:${Math.random()>.4?'50%':'3px'};--px:${-80+Math.random()*160}px;--py:${20+Math.random()*100}px;--pd:${.7+Math.random()*.8}s;--pde:${i*.035}s`;
+    document.body.appendChild(p);setTimeout(()=>p.remove(),1700);
+  }
+}
+
+// ── TABS ────────────────────────────────────────────────────
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('tab-'+t.dataset.tab).classList.add('active');
+  });
+});
+
+// ── PLAYER ──────────────────────────────────────────────────
+const TRACKS=[
+  {name:'☕ Lofi Chill — Study Beats',url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'},
+  {name:'🌿 Green Tea Vibes',url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3'},
+  {name:'🌧️ Rainy Day Focus',url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-13.mp3'},
+  {name:'🌙 Late Night Coding',url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-16.mp3'},
+];
+const ap=document.getElementById('ap');
+const pplay=document.getElementById('pplay'),pprev=document.getElementById('pprev'),pnext=document.getElementById('pnext');
+const tinfo=document.getElementById('tinfo'),pvol=document.getElementById('pvol'),eqEl=document.getElementById('eq');
+let ti=0,playing=false;
+function loadT(i){ap.src=TRACKS[i].url;tinfo.textContent=TRACKS[i].name;ap.volume=pvol.value/100;}
+function setEQ(on){eqEl.querySelectorAll('span').forEach(s=>s.style.animationPlayState=on?'running':'paused');}
+function togglePlay(){
+  if(playing){ap.pause();pplay.textContent='▶';playing=false;setEQ(false);}
+  else{loadT(ti);ap.play().catch(()=>{});pplay.textContent='⏸';playing=true;setEQ(true);}
+}
+pplay.addEventListener('click',togglePlay);
+pprev.addEventListener('click',()=>{ti=(ti-1+TRACKS.length)%TRACKS.length;loadT(ti);if(playing)ap.play().catch(()=>{});});
+pnext.addEventListener('click',()=>{ti=(ti+1)%TRACKS.length;loadT(ti);if(playing)ap.play().catch(()=>{});});
+pvol.addEventListener('input',()=>{ap.volume=pvol.value/100;});
+ap.addEventListener('ended',()=>{ti=(ti+1)%TRACKS.length;loadT(ti);ap.play().catch(()=>{});});
+loadT(0);
+
+// ── SEND MAIL ───────────────────────────────────────────────
+document.getElementById('sendbtn').addEventListener('click',()=>{
+  const n=document.getElementById('fn').value,e=document.getElementById('fe').value;
+  const t=document.getElementById('ft').value,m=document.getElementById('fm').value;
+  const body=encodeURIComponent(`Olá Tainara!\n\nMeu nome é ${n} (${e}).\n\nTipo de projeto: ${t}\n\n${m}`);
+  window.open(`mailto:tatimes.almeida@gmail.com?subject=Proposta via site — ${t}&body=${body}`);
+  confetti(window.innerWidth/2,window.innerHeight/2);
+});
+</script>
+</body>
+</html>
