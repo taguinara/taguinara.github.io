@@ -244,17 +244,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 <!-- MAIN -->
 <div class="layout">
   <div class="header">
-    <div class="header-name">Tainara Almeida 🐇</div>
+    <div class="header-name">Tainara Almeida</div>
     <div class="header-sub">✦ ciência de dados &amp; biblioteconomia ✦</div>
     <div class="header-loc">📍 Brasília, DF &nbsp;·&nbsp;</div>
   </div>
 
   <div class="tabs">
     <button class="tab active" data-tab="sobre">🌸 sobre</button>
-    <button class="tab" data-tab="edu">📚 educação</button>
-    <button class="tab" data-tab="exp">💼 experiência</button>
     <button class="tab" data-tab="skills">🛠 habilidades</button>
-    <button class="tab" data-tab="proj">🌿 projetos</button>
     <button class="tab" data-tab="work">✉️ work</button>
   </div>
 
@@ -275,7 +272,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <div class="slinks" style="margin-top:16px">
         <a class="slink" href="https://linkedin.com/in/tainaramalmeida/" target="_blank">🔗 LinkedIn</a>
         <a class="slink" href="https://github.com/taguinara" target="_blank">🐙 GitHub</a>
-        <a class="slink" href="mailto:tatimes.almeida@gmail.com">📧 Email</a>
+        <a class="slink" href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#116;&#97;&#116;&#105;&#109;&#101;&#115;&#46;&#97;&#108;&#109;&#101;&#105;&#100;&#97;&#64;&#103;&#109;&#97;&#105;&#108;&#46;&#99;&#111;&#109;">📧 Email</a>
       </div>
     </div>
   </div>
@@ -336,8 +333,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="card">
       <h2>📌 contato direto</h2>
       <div class="slinks">
-        <a class="slink" href="mailto:tatimes.almeida@gmail.com">📧 Gmail</a>
-        <a class="slink" href="https://linkedin.com/in/tainaramalmeida/" target="_blank">🔗 LinkedIn</a>
+        <a class="slink" href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#116;&#97;&#116;&#105;&#109;&#101;&#115;&#46;&#97;&#108;&#109;&#101;&#105;&#100;&#97;&#64;&#103;&#109;&#97;&#105;&#108;&#46;&#99;&#111;&#109;">📧 Gmail</a>        <a class="slink" href="https://linkedin.com/in/tainaramalmeida/" target="_blank">🔗 LinkedIn</a>
         <a class="slink" href="https://github.com/taguinara" target="_blank">🐙 GitHub</a>
       </div>
     </div>
@@ -699,12 +695,20 @@ pvol.addEventListener('input',()=>{
 tinfo.textContent=TRACKS[ti].name;
 
 // ── SEND MAIL ───────────────────────────────────────────────
-document.getElementById('sendbtn').addEventListener('click',()=>{
-  const n=document.getElementById('fn').value,e=document.getElementById('fe').value;
-  const t=document.getElementById('ft').value,m=document.getElementById('fm').value;
-  const body=encodeURIComponent(`Olá Tainara!\n\nMeu nome é ${n} (${e}).\n\nTipo de projeto: ${t}\n\n${m}`);
-  window.open(`mailto:tatimes.almeida@gmail.com?subject=Proposta via site — ${t}&body=${body}`);
-  confetti(window.innerWidth/2,window.innerHeight/2);
+document.getElementById('sendbtn').addEventListener('click', () => {
+  const encodedEmail = "dGF0aW1lcy5hbG1laWRhQGdtYWlsLmNvbQ==";
+  
+  const n = document.getElementById('fn').value, 
+        e = document.getElementById('fe').value;
+  const t = document.getElementById('ft').value, 
+        m = document.getElementById('fm').value;
+
+  const body = encodeURIComponent(`Olá Tainara!\n\nMeu nome é ${n} (${e}).\n\nTipo de projeto: ${t}\n\n${m}`);
+
+  // O comando 'atob' decodifica o e-mail apenas no momento do clique
+  window.open(`mailto:${atob(encodedEmail)}?subject=Proposta via site — ${t}&body=${body}`);
+  
+  confetti(window.innerWidth / 2, window.innerHeight / 2);
 });
 </script>
 </body>
